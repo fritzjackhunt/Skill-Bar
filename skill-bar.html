@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Skill Bar Loader</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+        }
+        .content {
+            padding: 100px 20px;
+            height: 1500px; /* Make the content tall enough to scroll */
+        }
+        .target-section {
+            height: 500px; /* Height of the target section */
+            background-color: #f8f9fa; /* Light background for visibility */
+            margin-top: 50vh; /* Position it below the fold */
+            padding: 20px;
+        }
+        .single-skill-bar {
+            margin-bottom: 20px;
+        }
+        .skill-label {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .progress {
+            height: 25px; /* Height of the progress bar */
+        }
+    </style>
+</head>
+<body>
+
+<div class="content">
+    <h1>Scroll Down to See the Skill Bar in Action</h1>
+    <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris non lacinia odio.</p>
+    
+    <!-- Target Section -->
+    <div class="target-section" id="targetSection">
+        <h2>This is the Skill Section</h2>
+        <p>The skill bars will fill as you scroll to this section.</p>
+
+        <!-- Skill Bars -->
+        <div class="single-skill-bar">
+            <div class="skill-label">
+                <span>HTML</span>
+                <span class="number-percentage" data-value="90" data-animation-duration="2000">0%</span>
+            </div>
+            <div class="progress">
+                <div class="progress-bar skill-track" role="progressbar" style="width: 0%;" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
+            </div>
+        </div>
+
+        <div class="single-skill-bar">
+            <div class="skill-label">
+                <span>CSS</span>
+                <span class="number-percentage" data-value="85" data-animation-duration="2000">0%</span>
+            </div>
+            <div class="progress">
+                <div class="progress-bar skill-track" role="progressbar" style="width: 0%;" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
+            </div>
+        </div>
+
+        <div class="single-skill-bar">
+            <div class="skill-label">
+                <span>JavaScript</span>
+                <span class="number-percentage" data-value="75" data-animation-duration="2000">0%</span>
+            </div>
+            <div class="progress">
+                <div class="progress-bar skill-track" role="progressbar" style="width: 0%;" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
+            </div>
+        </div>
+
+    </div>
+
+    <p>More content below...</p>
+</div>
+
+<script>
+// Function to animate numbers
+$.fn.animateNumbers = function(targetValue, isInteger, duration) {
+    var $this = $(this);
+    var startValue = parseInt($this.text(), 10);
+    var startTime = performance.now();
+
+    function animate(time) {
+        var elapsed = time - startTime;
+        var progress = Math.min(elapsed / duration, 1);
+        
+        var newValue = Math.floor(startValue + (targetValue - startValue) * progress);
+        
+        if (isInteger) {
+            $this.text(newValue + "%");
+        } else {
+            $this.text((newValue).toFixed(2));
+        }
+
+        if (progress < 1) {
+            requestAnimationFrame(animate);
+        } else {
+            $this.text(targetValue + "%"); // Ensure it ends at target value
+        }
+    }
+
+    requestAnimationFrame(animate);
+};
+
+// Progress bar loading function
+function loadSkillBars() {
+    $('.single-skill-bar').each(function() {
+        var $this = $(this);
+        var $skillTrack = $this.find('.skill-track');
+        var $percentageLabel = $this.find('.number-percentage');
+        
+        var targetValue = $percentageLabel.data('value');
+        
+        // Animate numbers and progress bar
+        $percentageLabel.animateNumbers(targetValue, true, $percentageLabel.data('animation-duration'));
+        
+        // Animate progress bar width
+        $skillTrack.animate({
+            width: targetValue + "%"
+        }, $percentageLabel.data('animation-duration'));
+    });
+}
+
+// Check if the target section is in view
+function checkScroll() {
+    const rect = document.getElementById("targetSection").getBoundingClientRect();
+    
+    if (rect.top >= 0 && rect.bottom <= window.innerHeight) {
+        loadSkillBars(); // Load skill bars when in view
+        window.removeEventListener("scroll", checkScroll); // Remove listener after loading
+    }
+}
+
+// Add scroll event listener
+window.addEventListener("scroll", checkScroll);
+</script>
+
+</body>
+</html>
